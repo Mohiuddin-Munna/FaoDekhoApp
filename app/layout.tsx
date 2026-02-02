@@ -1,6 +1,8 @@
 // app/layout.tsx
 import type { Metadata, Viewport } from 'next'
 import { cinzel, manrope } from '@/lib/fonts'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -39,10 +41,17 @@ export default function RootLayout({
         
         {/* Main app wrapper */}
         <div className="relative flex min-h-screen flex-col">
-          {/* Main content */}
-          <main id="main-content" className="flex-1">
+          
+          {/* Navbar */}
+          <Navbar />
+          
+          {/* Main content - pt-18 for navbar height (4.5rem = 72px) */}
+          <main id="main-content" className="flex-1 pt-18">
             {children}
           </main>
+          
+          {/* Footer */}
+          <Footer />
         </div>
       </body>
     </html>
