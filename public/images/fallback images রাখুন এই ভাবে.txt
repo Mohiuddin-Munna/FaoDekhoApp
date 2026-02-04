@@ -1,7 +1,7 @@
 Fallback Images (Optional)	Placeholder images
 public/
 └── images/
-    ├── no-poster.png     (500x750 placeholder)
-    ├── no-backdrop.png   (1280x720 placeholder)
-    ├── no-profile.png    (185x278 placeholder)
-    └── no-still.png      (300x169 placeholder)
+    ├── no-poster.webp     (500x750 placeholder)
+    ├── no-backdrop.webp   (1280x720 placeholder)
+    ├── no-profile.webp    (185x278 placeholder)
+    └── no-still.webp      (300x169 placeholder)

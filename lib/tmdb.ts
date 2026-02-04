@@ -39,7 +39,7 @@ export function getPosterUrl(
   path: string | null,
   size: PosterSize = 'w500'
 ): string {
-  if (!path) return '/images/no-poster.png';
+  if (!path) return '/images/no-poster.webp';
   return `${TMDB_IMAGE_BASE_URL}/${size}${path}`;
 }
 
@@ -47,7 +47,7 @@ export function getBackdropUrl(
   path: string | null,
   size: BackdropSize = 'original'
 ): string {
-  if (!path) return '/images/no-backdrop.png';
+  if (!path) return '/images/no-backdrop.webp';
   return `${TMDB_IMAGE_BASE_URL}/${size}${path}`;
 }
 
@@ -55,7 +55,7 @@ export function getProfileUrl(
   path: string | null,
   size: ProfileSize = 'w185'
 ): string {
-  if (!path) return '/images/no-profile.png';
+  if (!path) return '/images/no-profile.webp';
   return `${TMDB_IMAGE_BASE_URL}/${size}${path}`;
 }
 
@@ -63,7 +63,7 @@ export function getStillUrl(
   path: string | null,
   size: StillSize = 'w300'
 ): string {
-  if (!path) return '/images/no-still.png';
+  if (!path) return '/images/no-still.webp';
   return `${TMDB_IMAGE_BASE_URL}/${size}${path}`;
 }
 
