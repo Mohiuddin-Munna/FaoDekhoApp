@@ -93,7 +93,7 @@ export default function WatchPlayer({
     setIsPlayerActive(true);
   };
 
-  // Start hide timer - works in both normal and fullscreen mode
+  // Start hide timer
   const startHideTimer = useCallback(() => {
     if (hideTimeoutRef.current) {
       clearTimeout(hideTimeoutRef.current);
@@ -109,23 +109,6 @@ export default function WatchPlayer({
     setShowFullscreenButton(true);
     startHideTimer();
   }, [startHideTimer]);
-
-  // Handle mouse move on player - show button
-  const handleMouseMove = useCallback(() => {
-    if (isPlayerActive) {
-      showButton();
-    }
-  }, [isPlayerActive, showButton]);
-
-  // Handle mouse leave - hide button immediately
-  const handleMouseLeave = useCallback(() => {
-    if (!isFullscreen) {
-      setShowFullscreenButton(false);
-      if (hideTimeoutRef.current) {
-        clearTimeout(hideTimeoutRef.current);
-      }
-    }
-  }, [isFullscreen]);
 
   // Fullscreen toggle function
   const toggleFullscreen = async () => {
@@ -265,8 +248,6 @@ export default function WatchPlayer({
           ═══════════════════════════════════════════════════════════════ */}
       <div
         ref={playerContainerRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
         className={`
           relative
           rounded-vintage
@@ -381,8 +362,28 @@ export default function WatchPlayer({
               )}
 
               {/* ═══════════════════════════════════════════════════════════
+                  HOVER ZONE - Bottom Right Area
+                  Invisible zone for detecting mouse near button area
+                  Works in both normal and fullscreen mode
+                  ═══════════════════════════════════════════════════════ */}
+              {isPlayerActive && (
+                <div
+                  onMouseEnter={showButton}
+                  onMouseLeave={() => startHideTimer()}
+                  className={`
+                    absolute z-25
+                    ${isFullscreen 
+                      ? 'bottom-0 right-0 w-48 h-24' 
+                      : 'bottom-0 right-0 w-40 h-20'
+                    }
+                  `}
+                />
+              )}
+
+              {/* ═══════════════════════════════════════════════════════════
                   FULLSCREEN BUTTON
-                  - Both modes: Shows on mouse move, auto-hides after 3 seconds
+                  - Shows when mouse enters hover zone
+                  - Auto-hides after 3 seconds
                   - Stays visible when hovering over button
                   ═══════════════════════════════════════════════════════ */}
               {isPlayerActive && (
@@ -405,13 +406,13 @@ export default function WatchPlayer({
                     border border-gold/30 hover:border-gold
                     rounded-lg px-3 py-2
                     text-text-main hover:text-void
-                    transition-all duration-500
+                    transition-all duration-300
                     ${isFullscreen 
                       ? 'bottom-6 right-6' 
                       : 'bottom-16 right-3'
                     }
                     ${showFullscreenButton 
-                      ? 'opacity-90' 
+                      ? 'opacity-100' 
                       : 'opacity-0 pointer-events-none'
                     }
                   `}
