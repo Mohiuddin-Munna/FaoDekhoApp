@@ -362,9 +362,22 @@ export default function WatchPlayer({
               )}
 
               {/* ═══════════════════════════════════════════════════════════
-                  HOVER ZONE - Bottom Right Area
-                  Invisible zone for detecting mouse near button area
-                  Works in both normal and fullscreen mode
+                  HOVER ZONES - Desktop Only
+                  
+                  Layout Design:
+                  ┌────────────────────────────────────────┐
+                  │                              ┌───────┐ │
+                  │                              │ RIGHT │ │
+                  │                              │ ZONE  │ │
+                  │      [VIDEO CONTENT]         │ (40%) │ │
+                  │                              │       │ │
+                  │                              └───────┘ │
+                  ├────────────────────────────────────────┤
+                  │  [Native Controls - Leave Free 15%]    │
+                  └────────────────────────────────────────┘
+                  
+                  - Right zone: Right 40% width, top 85% height
+                  - Bottom 15% is left free for native player controls
                   ═══════════════════════════════════════════════════════ */}
               {isPlayerActive && (
                 <div
@@ -372,19 +385,27 @@ export default function WatchPlayer({
                   onMouseLeave={() => startHideTimer()}
                   className={`
                     absolute z-25
-                    ${isFullscreen 
-                      ? 'bottom-0 right-0 w-48 h-24' 
-                      : 'bottom-0 right-0 w-40 h-20'
-                    }
+                    hidden md:block
+                    top-0 right-0
+                    w-2/5
+                    ${isFullscreen ? 'h-[85%]' : 'h-[85%]'}
                   `}
                 />
               )}
 
               {/* ═══════════════════════════════════════════════════════════
                   FULLSCREEN BUTTON
+                  
+                  Desktop (md+):
+                  - Hidden by default
                   - Shows when mouse enters hover zone
                   - Auto-hides after 3 seconds
-                  - Stays visible when hovering over button
+                  - Position: Above native controls (bottom-16)
+                  
+                  Mobile (<md):
+                  - Hidden in normal mode (use button below player)
+                  - In fullscreen: Shows at TOP-right (native controls at bottom)
+                  - Semi-transparent, always visible in fullscreen
                   ═══════════════════════════════════════════════════════ */}
               {isPlayerActive && (
                 <button
@@ -400,7 +421,7 @@ export default function WatchPlayer({
                   }}
                   className={`
                     absolute z-30
-                    flex items-center gap-2
+                    items-center gap-2
                     bg-void/90 hover:bg-gold
                     backdrop-blur-sm
                     border border-gold/30 hover:border-gold
@@ -408,12 +429,19 @@ export default function WatchPlayer({
                     text-text-main hover:text-void
                     transition-all duration-300
                     ${isFullscreen 
-                      ? 'bottom-6 right-6' 
-                      : 'bottom-16 right-3'
-                    }
-                    ${showFullscreenButton 
-                      ? 'opacity-100' 
-                      : 'opacity-0 pointer-events-none'
+                      ? `
+                          flex
+                          top-4 right-4
+                          md:top-auto md:bottom-20 md:right-6
+                          opacity-70 hover:opacity-100
+                          md:transition-opacity md:duration-300
+                          ${showFullscreenButton ? 'md:opacity-100' : 'md:opacity-0 md:pointer-events-none'}
+                        ` 
+                      : `
+                          hidden md:flex
+                          bottom-20 right-3
+                          ${showFullscreenButton ? 'opacity-100' : 'opacity-0 pointer-events-none'}
+                        `
                     }
                   `}
                   title={isFullscreen ? 'Exit Fullscreen (Esc)' : 'Fullscreen'}
@@ -421,7 +449,7 @@ export default function WatchPlayer({
                   {isFullscreen ? (
                     <>
                       <Minimize2 className="w-4 h-4" />
-                      <span className="text-xs font-medium">Exit Fullscreen</span>
+                      <span className="text-xs font-medium">Exit</span>
                     </>
                   ) : (
                     <>
@@ -444,7 +472,7 @@ export default function WatchPlayer({
           <p>
             If video doesn&apos;t play, try switching the source above.
           </p>
-          {/* Clickable Fullscreen Button */}
+          {/* Clickable Fullscreen Button - Always visible, good for mobile */}
           <button
             onClick={toggleFullscreen}
             className="flex items-center gap-1.5 text-gold hover:text-gold-light transition-colors"
