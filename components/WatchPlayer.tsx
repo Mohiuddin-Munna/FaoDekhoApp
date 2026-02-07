@@ -2,12 +2,16 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { ChevronDown, Server, AlertCircle, Play, Maximize2, Minimize2 } from 'lucide-react';
+import { ChevronDown, Server, AlertCircle, Play, Maximize2, Minimize2, Download, ExternalLink } from 'lucide-react';
 import {
   getAutoEmbedMovieUrl,
   getAutoEmbedTVUrl,
   getVidSrcMovieUrl,
   getVidSrcTVUrl,
+  getVidrockMovieUrl,
+  getVidrockTVUrl,
+  getDownloadMovieUrl,
+  getDownloadTVUrl,
 } from '@/lib/tmdb';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -22,7 +26,7 @@ interface WatchPlayerProps {
   episodeTitle?: string;
 }
 
-type SourceType = 'autoembed' | 'vidsrc';
+type SourceType = 'autoembed' | 'vidsrc' | 'vidrock';
 
 interface Source {
   id: SourceType;
@@ -65,6 +69,11 @@ export default function WatchPlayer({
             name: 'VidSrc',
             getUrl: () => getVidSrcMovieUrl(tmdbId),
           },
+          {
+            id: 'vidrock',
+            name: 'Vidrock',
+            getUrl: () => getVidrockMovieUrl(tmdbId),
+          },
         ]
       : [
           {
@@ -77,7 +86,17 @@ export default function WatchPlayer({
             name: 'VidSrc',
             getUrl: () => getVidSrcTVUrl(tmdbId, season, episode),
           },
+          {
+            id: 'vidrock',
+            name: 'Vidrock',
+            getUrl: () => getVidrockTVUrl(tmdbId, season, episode),
+          },
         ];
+
+  // Download URL (Movie & TV)
+  const downloadUrl = type === 'movie' 
+    ? getDownloadMovieUrl(tmdbId) 
+    : getDownloadTVUrl(tmdbId, season, episode);
 
   const currentSourceData = sources.find((s) => s.id === currentSource);
   const playerUrl = currentSourceData?.getUrl() || '';
@@ -91,6 +110,13 @@ export default function WatchPlayer({
 
   const activatePlayer = () => {
     setIsPlayerActive(true);
+  };
+
+  // Open download link in new tab
+  const handleDownload = () => {
+    if (downloadUrl) {
+      window.open(downloadUrl, '_blank', 'noopener,noreferrer');
+    }
   };
 
   // Start hide timer
@@ -175,71 +201,121 @@ export default function WatchPlayer({
           )}
         </div>
 
-        {/* Source Switcher */}
-        <div className="relative">
+        {/* Controls */}
+        <div className="flex items-center gap-2">
+          {/* Download Button */}
           <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            onClick={handleDownload}
             className="
-              flex items-center gap-2 
-              bg-surface hover:bg-surface-light
-              border border-sepia hover:border-gold/50
-              rounded-vintage px-4 py-2
-              text-sm text-gold
+              flex items-center gap-2
+              bg-surface hover:bg-gold
+              border border-sepia hover:border-gold
+              rounded-vintage px-3 py-2
+              text-sm text-gold hover:text-void
               transition-all duration-300
-              w-full sm:w-auto justify-between sm:justify-start
             "
+            title={type === 'tv' ? 'Download Episode' : 'Download Movie'}
           >
-            <Server className="w-4 h-4" />
-            <span>{currentSourceData?.name || 'Select Source'}</span>
-            <ChevronDown
-              className={`w-4 h-4 transition-transform duration-300 ${
-                isDropdownOpen ? 'rotate-180' : ''
-              }`}
-            />
+            <Download className="w-4 h-4" />
+            <span className="hidden sm:inline">Download</span>
           </button>
 
-          {/* Dropdown Menu */}
-          {isDropdownOpen && (
-            <>
-              {/* Backdrop */}
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setIsDropdownOpen(false)}
+          {/* Source Switcher */}
+          <div className="relative">
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="
+                flex items-center gap-2 
+                bg-surface hover:bg-surface-light
+                border border-sepia hover:border-gold/50
+                rounded-vintage px-4 py-2
+                text-sm text-gold
+                transition-all duration-300
+                w-full sm:w-auto justify-between sm:justify-start
+              "
+            >
+              <Server className="w-4 h-4" />
+              <span>{currentSourceData?.name || 'Select Source'}</span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-300 ${
+                  isDropdownOpen ? 'rotate-180' : ''
+                }`}
               />
+            </button>
 
-              {/* Menu */}
-              <div
-                className="
-                  absolute right-0 top-full mt-2 z-50
-                  w-full sm:w-48
-                  bg-surface border border-sepia
-                  rounded-vintage overflow-hidden
-                  shadow-cinema
-                  animate-scale-in origin-top-right
-                "
-              >
-                {sources.map((source) => (
-                  <button
-                    key={source.id}
-                    onClick={() => handleSourceChange(source.id)}
-                    className={`
-                      w-full flex items-center gap-3 px-4 py-3
-                      text-sm text-left
-                      transition-colors duration-200
-                      ${
-                        currentSource === source.id
-                          ? 'bg-gold/10 text-gold border-l-2 border-gold'
-                          : 'text-text-warm hover:bg-surface-light hover:text-text-main border-l-2 border-transparent'
-                      }
-                    `}
-                  >
-                    <Server className="w-4 h-4" />
-                    {source.name}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
+            {/* Dropdown Menu */}
+            {isDropdownOpen && (
+              <>
+                {/* Backdrop */}
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setIsDropdownOpen(false)}
+                />
+
+                {/* Menu */}
+                <div
+                  className="
+                    absolute right-0 top-full mt-2 z-50
+                    w-full sm:w-52
+                    bg-surface border border-sepia
+                    rounded-vintage overflow-hidden
+                    shadow-cinema
+                    animate-scale-in origin-top-right
+                  "
+                >
+                  {/* Streaming Sources */}
+                  <div className="py-1">
+                    <p className="px-4 py-2 text-xs text-text-muted uppercase tracking-wide">
+                      Streaming
+                    </p>
+                    {sources.map((source) => (
+                      <button
+                        key={source.id}
+                        onClick={() => handleSourceChange(source.id)}
+                        className={`
+                          w-full flex items-center gap-3 px-4 py-2.5
+                          text-sm text-left
+                          transition-colors duration-200
+                          ${
+                            currentSource === source.id
+                              ? 'bg-gold/10 text-gold border-l-2 border-gold'
+                              : 'text-text-warm hover:bg-surface-light hover:text-text-main border-l-2 border-transparent'
+                          }
+                        `}
+                      >
+                        <Server className="w-4 h-4" />
+                        {source.name}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Download Option */}
+                  <div className="border-t border-sepia py-1">
+                    <p className="px-4 py-2 text-xs text-text-muted uppercase tracking-wide">
+                      Download
+                    </p>
+                    <button
+                      onClick={() => {
+                        handleDownload();
+                        setIsDropdownOpen(false);
+                      }}
+                      className="
+                        w-full flex items-center gap-3 px-4 py-2.5
+                        text-sm text-left
+                        text-text-warm hover:bg-surface-light hover:text-gold
+                        border-l-2 border-transparent
+                        transition-colors duration-200
+                      "
+                    >
+                      <Download className="w-4 h-4" />
+                      <span>{type === 'tv' ? 'Download Episode' : 'Download Movie'}</span>
+                      <ExternalLink className="w-3 h-3 ml-auto text-text-muted" />
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -313,7 +389,6 @@ export default function WatchPlayer({
 
               {/* ═══════════════════════════════════════════════════════════
                   PLAY OVERLAY - Click to Activate Player
-                  Protects from ad redirects on first click
                   ═══════════════════════════════════════════════════════ */}
               {!isPlayerActive && (
                 <div
@@ -362,50 +437,23 @@ export default function WatchPlayer({
               )}
 
               {/* ═══════════════════════════════════════════════════════════
-                  HOVER ZONES - Desktop Only
-                  
-                  Layout Design:
-                  ┌────────────────────────────────────────┐
-                  │                              ┌───────┐ │
-                  │                              │ RIGHT │ │
-                  │                              │ ZONE  │ │
-                  │      [VIDEO CONTENT]         │ (40%) │ │
-                  │                              │       │ │
-                  │                              └───────┘ │
-                  ├────────────────────────────────────────┤
-                  │  [Native Controls - Leave Free 15%]    │
-                  └────────────────────────────────────────┘
-                  
-                  - Right zone: Right 40% width, top 85% height
-                  - Bottom 15% is left free for native player controls
+                  HOVER ZONE - Desktop Only
                   ═══════════════════════════════════════════════════════ */}
               {isPlayerActive && (
                 <div
                   onMouseEnter={showButton}
                   onMouseLeave={() => startHideTimer()}
-                  className={`
+                  className="
                     absolute z-25
                     hidden md:block
-                    top-0 right-0
-                    w-2/5
-                    ${isFullscreen ? 'h-[85%]' : 'h-[85%]'}
-                  `}
+                    top-16 right-0
+                    w-2/5 h-[45%]
+                  "
                 />
               )}
 
               {/* ═══════════════════════════════════════════════════════════
-                  FULLSCREEN BUTTON
-                  
-                  Desktop (md+):
-                  - Hidden by default
-                  - Shows when mouse enters hover zone
-                  - Auto-hides after 3 seconds
-                  - Position: Above native controls (bottom-16)
-                  
-                  Mobile (<md):
-                  - Hidden in normal mode (use button below player)
-                  - In fullscreen: Shows at TOP-right (native controls at bottom)
-                  - Semi-transparent, always visible in fullscreen
+                  FULLSCREEN / EXIT BUTTON
                   ═══════════════════════════════════════════════════════ */}
               {isPlayerActive && (
                 <button
@@ -428,18 +476,18 @@ export default function WatchPlayer({
                     rounded-lg px-3 py-2
                     text-text-main hover:text-void
                     transition-all duration-300
+                    right-4
                     ${isFullscreen 
                       ? `
                           flex
-                          top-4 right-4
-                          md:top-auto md:bottom-20 md:right-6
+                          top-10 md:top-4
                           opacity-70 hover:opacity-100
                           md:transition-opacity md:duration-300
                           ${showFullscreenButton ? 'md:opacity-100' : 'md:opacity-0 md:pointer-events-none'}
                         ` 
                       : `
                           hidden md:flex
-                          bottom-20 right-3
+                          top-6
                           ${showFullscreenButton ? 'opacity-100' : 'opacity-0 pointer-events-none'}
                         `
                     }
@@ -479,6 +527,14 @@ export default function WatchPlayer({
           >
             <Maximize2 className="w-3.5 h-3.5" />
             <span>Fullscreen</span>
+          </button>
+          {/* Download Link (Mobile friendly) */}
+          <button
+            onClick={handleDownload}
+            className="flex items-center gap-1.5 text-gold hover:text-gold-light transition-colors"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Download</span>
           </button>
         </div>
         

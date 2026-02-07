@@ -393,6 +393,8 @@ export function formatVoteAverage(vote: number): string {
 }
 
 // ===== Streaming URL Builders =====
+
+// AutoEmbed
 export function getAutoEmbedMovieUrl(tmdbId: number): string {
   return `https://autoembed.co/movie/tmdb/${tmdbId}`;
 }
@@ -401,12 +403,31 @@ export function getAutoEmbedTVUrl(tmdbId: number, season: number = 1, episode: n
   return `https://autoembed.co/tv/tmdb/${tmdbId}-${season}-${episode}`;
 }
 
+// VidSrc
 export function getVidSrcMovieUrl(tmdbId: number): string {
   return `https://vidsrc.xyz/embed/movie/${tmdbId}`;
 }
 
 export function getVidSrcTVUrl(tmdbId: number, season: number = 1, episode: number = 1): string {
   return `https://vidsrc.xyz/embed/tv/${tmdbId}/${season}/${episode}`;
+}
+
+// Vidrock
+export function getVidrockMovieUrl(tmdbId: number): string {
+  return `https://vidrock.net/movie/${tmdbId}`;
+}
+
+export function getVidrockTVUrl(tmdbId: number, season: number = 1, episode: number = 1): string {
+  return `https://vidrock.net/tv/${tmdbId}/${season}/${episode}`;
+}
+
+// Download (dl.vidsrc.vip) - Movie & TV
+export function getDownloadMovieUrl(tmdbId: number): string {
+  return `https://dl.vidsrc.vip/movie/${tmdbId}`;
+}
+
+export function getDownloadTVUrl(tmdbId: number, season: number = 1, episode: number = 1): string {
+  return `https://dl.vidsrc.vip/tv/${tmdbId}/${season}/${episode}`;
 }
 
 // ===== Export Genre IDs =====

@@ -297,6 +297,7 @@ export default async function WatchPage({ params, searchParams }: WatchPageProps
               episodes={episodes}
               currentSeason={currentSeasonNumber}
               currentEpisode={currentEpisodeNumber}
+              tmdbId={tvShow.id}
             />
           </div>
         </div>
